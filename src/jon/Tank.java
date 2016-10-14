@@ -35,7 +35,7 @@ public class Tank {
 		return log.get(log.size() - 1).getEnergy();
 	}
 	
-	public double getSorce() {	
+	public double getScore() {	
 		return 100/getDistance() + 100/getEnergy();
 	}
 	
