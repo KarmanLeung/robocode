@@ -38,13 +38,13 @@ public class AGGHHH extends AdvancedRobot {
 	
 	
 	
-	public void onHitByBullet(HitByBulletEvent e){
-		double bearing = e.getBearing(); //Get the direction which is arrived the bullet.
-		//if(getEnergy() < 50){ // if the energy is low, the robot go away from the enemy
-			setTurnRight( e.getBearing() + 90); 
-			setAhead(75); 
-		//}
-	}
+//	public void onHitByBullet(HitByBulletEvent e){
+//		double bearing = e.getBearing(); //Get the direction which is arrived the bullet.
+//		//if(getEnergy() < 50){ // if the energy is low, the robot go away from the enemy
+//			setTurnRight( e.getBearing() + 90); 
+//			setAhead(75); 
+//		//}
+//	}
 	
 	
 	public void run() {
@@ -143,7 +143,7 @@ public class AGGHHH extends AdvancedRobot {
 					sorted(Comparator.comparing( p -> p.getScore() )).
 					collect(Collectors.toList());
 			
-				setTarget(enemys.get(0).getName());
+				setTarget(enemys.get(enemys.size() - 1).getName());
 			
 			
 		}
@@ -191,7 +191,7 @@ public class AGGHHH extends AdvancedRobot {
 
 	public void doIt(){
 		if(getTarget() != null) {
-			TargetingData data = scannedRobots.get(getTarget()).getTargetDataCommon(getTime() - 20);
+			TargetingData data = scannedRobots.get(getTarget()).getTargetDataCommon(getTime() - 100);
 			
 			setTurnGunRight(  normalizeBearing( data.getBearing() - getGunHeading() ));
 			fireMyBigGun(data.getFirepower());  				

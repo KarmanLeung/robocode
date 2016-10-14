@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 public class Utils {
 	
+
 	public TargetingData getTargetData(List<TankLog> logs) {
 		
 		TankLog rLog = logs.get(logs.size() - 1);
@@ -17,6 +18,7 @@ public class Utils {
 		
 		for(TankLog log : logs) {
 			Double target = calculateXY(log.getOrgin(), log.getDistance(), log.getBearing());
+			Double roundedTarget = new Double(  (int) target.getX() , (int) target.getY()  );
 			if(previous.putIfAbsent(target, 1) == null) {
 				Integer val = previous.get(target);
 				val++;
