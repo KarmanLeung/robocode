@@ -4,20 +4,17 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.geom.Point2D.Double;
 import java.util.Comparator;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import robocode.AdvancedRobot;
-import robocode.CustomEvent;
 import robocode.HitByBulletEvent;
-import robocode.RadarTurnCompleteCondition;
 import robocode.RobotDeathEvent;
 import robocode.ScannedRobotEvent;
 import robocode.TurnCompleteCondition;
 import robocode.WinEvent;
-import robocode.util.Utils;
 
 public class AGGHHH extends AdvancedRobot {
 
@@ -142,9 +139,9 @@ public class AGGHHH extends AdvancedRobot {
 			setTarget(tanks.get(0).getName());
 		} else {
 			// get closest 
-			List<Tank> enemys = tanks.values().stream().
+			List<Tank> enemys = tanks.stream().
 					sorted(Comparator.comparing( p -> p.getScore() )).
-					collect(Collectors.toList()).iterator().next();
+					collect(Collectors.toList());
 			
 				setTarget(enemys.get(0).getName());
 			
