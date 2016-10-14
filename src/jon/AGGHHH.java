@@ -22,6 +22,7 @@ import robocode.RobotDeathEvent;
 import robocode.ScannedRobotEvent;
 import robocode.TurnCompleteCondition;
 import robocode.WinEvent;
+import robocode.util.Utils;
 
 public class AGGHHH extends AdvancedRobot {
 
@@ -42,39 +43,7 @@ public class AGGHHH extends AdvancedRobot {
 		return n >= 0 ? 1 : -1;
 	}
 	
-	public void onCustomEvent(CustomEvent e) {
-		  if (e.getCondition() instanceof
-		    RadarTurnCompleteCondition) sweep();
-	}
-
-	private int radarDirection=1;
-
-	private void sweep() {
-	  double maxBearingAbs=0, maxBearing=0;
-	  int scannedBots=0;
-	  Iterator iterator = scannedRobots.values().
-	    iterator();
-
-	  while(iterator.hasNext()) {
-	    Tank tmp = (Tank)iterator.next();
-
-	    if (tmp!=null && tmp.isUpdated( getTime() )) {
-	      double bearing=robocode.util.Utils.normalAbsoluteAngle(getHeading() + tmp.getBearing() - getRadarHeading());
-	      if (Math.abs(bearing)>maxBearingAbs) { 
-	        maxBearingAbs=Math.abs(bearing); 
-	        maxBearing=bearing; 
-	      }
-	      scannedBots++;
-	    }
-	  }
-
-	  double radarTurn=180*radarDirection;
-	  if (scannedBots==getOthers()) 		
-	    radarTurn=maxBearing+sign(maxBearing)*22.5; 
-
-	  setTurnRadarRight(radarTurn);
-	  radarDirection=sign(radarTurn);
-	}
+	
 	
 	
 	public void onHitByBullet(HitByBulletEvent e){
@@ -99,29 +68,31 @@ public class AGGHHH extends AdvancedRobot {
 		setScanColor(Color.yellow);
 
 		// TODO work out where we are to determine which way to turn radar first (same time)
-		addCustomEvent(new RadarTurnCompleteCondition(this));
+		
 		setAdjustRadarForGunTurn(true);
 		setTurnRadarRight(360);
 
 		
 		Utils utils = new Utils();
 		
-		//setTurnRadarLeftRadians(999999999);
+		
 
 		while(true) {
 			
+			setTurnRadarLeftRadians(999999999);
 			getScannedRobotEvents();
 			
-			if(avoid()) {
-				// adjusting for wall, or tank
-			}
-			else {
-				avoidInProgress = false;
-				setTurnLeft(360 * randomFactor()); 
-				waitFor(new TurnCompleteCondition(this));
-				setAhead(200);
-			}
+//			if(avoid()) {
+//				// adjusting for wall, or tank
+//			}
+//			else {
+//				avoidInProgress = false;
+//				setTurnLeft(360 * randomFactor()); 
+//				waitFor(new TurnCompleteCondition(this));
+//				setAhead(200);
+//			}
 			
+			doIt();
 			
 			waitFor(new TurnCompleteCondition(this));
 		}
@@ -168,23 +139,19 @@ public class AGGHHH extends AdvancedRobot {
 	}
 	
 	public void selectTheBestTarget() {
-		if( scannedRobots.size() == 0 ) {
+		
+		List<Tank> tanks = scannedRobots.values().stream().filter( p -> ! p.isSentry() ).filter( p -> p.isAlive() ).collect(Collectors.toList());
+		if( tanks.size() == 0 ) {
 			setTarget(null);
-		} else if (scannedRobots.size() == 1) {
-			setTarget(scannedRobots.keys().nextElement());
+		} else if (tanks.size() == 1) {
+			setTarget(tanks.get(0).getName());
 		} else {
 			// get closest 
-			Tank enemy = scannedRobots.values().stream().
-					filter( p -> p.isAlive() ).
-					sorted(Comparator.comparing( p -> p.getDistance() )).
+			List<Tank> enemys = tanks.values().stream().
+					sorted(Comparator.comparing( p -> p.getScore() )).
 					collect(Collectors.toList()).iterator().next();
-			if(scannedRobots.containsKey(getTarget()) && enemy.getDistance() > scannedRobots.get(getTarget()).getDistance() * 0.9 ) {
-				// stops frequent switching
-			}
-			else {
-				// switch
-				setTarget(enemy.getName());
-			}
+			
+				setTarget(enemys.get(0).getName());
 			
 			
 		}

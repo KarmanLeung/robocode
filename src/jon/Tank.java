@@ -15,14 +15,28 @@ public class Tank {
 	private List<TankLog> log;
 	
 	private boolean isDead = false;
+	private boolean sentry;
 	
 	Tank(String name, ScannedRobotEvent e, Double orgin, double bearing) {
 		this.name = name;
 		this.isDead = false;
+		this.sentry = e.isSentryRobot();
 		
 		List<TankLog> newLog = new LinkedList<>();
 		newLog.add( new TankLog(e, orgin, bearing) );
 		this.log = newLog;
+	}
+	
+	public boolean isSentry(){
+		return sentry;
+	}
+	
+	public double getEnergy(){
+		return log.get(log.size() - 1).getEnergy();
+	}
+	
+	public double getSorce() {	
+		return 100/getDistance() + 100/getEnergy();
 	}
 	
 	public boolean isUpdated(long time){
