@@ -1,22 +1,17 @@
 package jon;
 
-import java.awt.geom.Point2D.Double;
 import java.awt.Color;
-import java.awt.geom.Point2D;
+import java.awt.Point;
+import java.awt.geom.Point2D.Double;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import robocode.AdvancedRobot;
 import robocode.CustomEvent;
 import robocode.HitByBulletEvent;
-import robocode.HitRobotEvent;
-import robocode.HitWallEvent;
 import robocode.RadarTurnCompleteCondition;
 import robocode.RobotDeathEvent;
 import robocode.ScannedRobotEvent;
@@ -65,7 +60,7 @@ public class AGGHHH extends AdvancedRobot {
 		setBodyColor(Color.green);
 		setGunColor(Color.black);
 		setRadarColor(Color.yellow);
-		setScanColor(Color.yellow);
+		setScanColor(Color.CYAN);
 
 		// TODO work out where we are to determine which way to turn radar first (same time)
 		
@@ -253,4 +248,73 @@ public class AGGHHH extends AdvancedRobot {
 	}
 	
 	
+	private Double sentry = new Double(0, 0);
+	private double mapWidth = 1000;
+	private double mapHeight = 800;
+	private final int rows = 8;
+    private final int cols = 10;
+    Double destination = null;
+	
+	private void seletTargetLocation() {
+	    //TODO: find sentry and set coordinates
+	    Point sentryQuadrant = toQuadrant(sentry);
+	    Point ourQuadrant = toQuadrant(new Double(getX(), getY()));
+	    
+        int nq = rand.nextInt(8);
+	    for(int i=0; i<20; ++i) {
+	        Point nextQuadrant = relativeQudarantToAbsolute(ourQuadrant, nq);
+	        if(isSafe(nextQuadrant, sentryQuadrant)) {
+	            destination = pickCoordinatesFromQuadrant(nextQuadrant);
+	            break;
+	        } else {
+	            nq =  rand.nextInt(8);
+	        }
+	    }
+	    
+	}
+	
+	
+	private Double pickCoordinatesFromQuadrant(Point quadrant){
+	    return new Double((quadrant.x + 0.5)*mapWidth/(double)cols, (quadrant.y + 0.5)*mapHeight/(double)rows);
+	}
+	
+	/**
+	 * Checks this quadrant is not too close to sentry and inside the field
+	 */
+	private boolean isSafe(Point nextQuadrant, Point sentryQuadrant) {
+        if (Math.abs(nextQuadrant.x-sentryQuadrant.x)>1 || Math.abs(nextQuadrant.y-sentryQuadrant.y)>1) {
+            return (nextQuadrant.x >= 0 && nextQuadrant.y >= 0 && nextQuadrant.x < cols && nextQuadrant.y < rows);  
+        }
+        return false;
+    }
+
+    Random rand = new Random();
+	
+	private Point toQuadrant(Double coords) {
+	    return new Point((int)(coords.x / mapWidth) * cols, (int)(coords.y / mapHeight) * rows);
+	}
+	
+	
+	private Point relativeQudarantToAbsolute(Point center, int neigbouringQuadrant) {
+	    switch (neigbouringQuadrant) {
+        case 0:
+            return new Point(center.x-1, center.y-1);
+        case 1:
+            return new Point(center.x, center.y-1);
+        case 2:
+            return new Point(center.x+1, center.y-1);
+        case 3:
+            return new Point(center.x+1, center.y);
+        case 4:
+            return new Point(center.x+1, center.y+1);
+        case 5:
+            return new Point(center.x, center.y+1);
+        case 6:
+            return new Point(center.x-1, center.y+1);
+        case 7:
+            return new Point(center.x-1, center.y);
+        default:
+            return center;
+        }
+	}
 }
